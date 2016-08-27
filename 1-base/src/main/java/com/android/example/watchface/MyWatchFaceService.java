@@ -20,6 +20,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -52,7 +54,7 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
     }
 
     private class Engine extends CanvasWatchFaceService.Engine {
-
+        private Bitmap mBackgroundBitmap;
         /* Handler to update the time once a second in interactive mode. */
         private final Handler mUpdateTimeHandler = new Handler() {
             @Override
@@ -100,6 +102,8 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
+
+            mBackgroundBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.shivahatpic);
 
             setWatchFaceStyle(new WatchFaceStyle.Builder(MyWatchFaceService.this)
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_SHORT)
@@ -151,6 +155,11 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
             super.onSurfaceChanged(holder, format, width, height);
             mWidth = width;
             mHeight = height;
+
+            float mScale = ((float) width) / (float) mBackgroundBitmap.getWidth();
+            mBackgroundBitmap = Bitmap.createScaledBitmap
+                    (mBackgroundBitmap, (int)(mBackgroundBitmap.getWidth() * mScale),
+                            (int)(mBackgroundBitmap.getHeight() * mScale), true);
             /*
              * Find the coordinates of the center point on the screen.
              * Ignore the window insets so that, on round watches
@@ -173,8 +182,8 @@ public class MyWatchFaceService extends CanvasWatchFaceService {
             mCalendar.setTimeInMillis(now);
 
             // Draw the background.
-            canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), mBackgroundPaint);
-
+            //canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), mBackgroundPaint);
+            canvas.drawBitmap(mBackgroundBitmap,0,0,mBackgroundPaint);
             /*
              * These calculations reflect the rotation in degrees per unit of time, e.g.,
              * 360 / 60 = 6 and 360 / 12 = 30.
